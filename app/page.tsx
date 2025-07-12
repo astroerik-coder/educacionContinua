@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import AdminPanel from "./components/AdminPanel";
-import PublicDisplay from "./components/PublicDisplay";
-import { AcademicProvider } from "./context/AcademicContext";
+import dynamic from "next/dynamic";
 import { Settings, Eye } from "lucide-react";
+
+// Importar los componentes dinámicamente para evitar problemas de importación circular
+const AdminPanel = dynamic(() => import("./components/AdminPanel"));
+const PublicDisplay = dynamic(() => import("./components/PublicDisplay"));
 
 function Navigation() {
   const [currentView, setCurrentView] = useState("public");
@@ -61,10 +63,6 @@ function Navigation() {
   );
 }
 
-export default function App() {
-  return (
-    <AcademicProvider>
-      <Navigation />
-    </AcademicProvider>
-  );
+export default function HomePage() {
+  return <Navigation />;
 }

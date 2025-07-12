@@ -5,6 +5,7 @@ generator client {
   provider = "prisma-client-js"
 }
 
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -40,8 +41,17 @@ model News {
   id          String   @id @default(cuid())
   title       String
   content     String
-  image       String?  // base64 o URL
+  image       String?
   publishDate String
-  endDate     String?  // Fecha de fin para ocultar la noticia (opcional)
+  endDate     String?
   createdAt   DateTime @default(now())
+}
+
+model User {
+  id                    String   @id @default(cuid())
+  name                  String?
+  email                 String   @unique
+  password              String
+  mustChangePassword    Boolean  @default(true)
+  createdAt             DateTime @default(now())
 }

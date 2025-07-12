@@ -1,18 +1,23 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, Edit, Trash2, BookOpen, GraduationCap, Newspaper } from "lucide-react"
+import { signOut } from "next-auth/react"
+import { Plus, Edit, Trash2, BookOpen, GraduationCap, Newspaper, UserCircle, Key, LogOut } from "lucide-react"
 import { useAcademic } from "../context/AcademicContext"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 import CourseForm from "./forms/CourseForm"
 import MasterForm from "./forms/MasterForm"
 import NewsForm from "./forms/NewsForm"
 
 export default function AdminPanel() {
   const { courses, masters, news, loading, deleteCourse, deleteMaster, deleteNews } = useAcademic()
-  const [activeTab, setActiveTab] = useState<"courses" | "masters" | "news">("courses")
+  const [activeTab, setActiveTab] = useState<"courses" | "masters" | "news" | "perfil">("courses")
   const [showForm, setShowForm] = useState(false)
   const [editingItem, setEditingItem] = useState<any>(null)
   const [wasLoading, setWasLoading] = useState(false)
+  const { data: session } = useSession()
+  const router = useRouter()
 
   // Cerrar formulario automáticamente cuando se complete la operación
   useEffect(() => {
@@ -37,6 +42,7 @@ export default function AdminPanel() {
     { id: "courses", label: "Cursos", icon: BookOpen, count: courses.length },
     { id: "masters", label: "Maestrías", icon: GraduationCap, count: masters.length },
     { id: "news", label: "Noticias", icon: Newspaper, count: news.length },
+    { id: "perfil", label: "Perfil", icon: UserCircle, count: 1 },
   ]
 
   return (
@@ -81,7 +87,7 @@ export default function AdminPanel() {
       {/* Content */}
       <div className="bg-white rounded-lg shadow-sm">
         {/* Action Bar */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-gray-200 flex justify-between items-center">
           <button
             onClick={() => setShowForm(true)}
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -89,6 +95,8 @@ export default function AdminPanel() {
             <Plus className="w-4 h-4 mr-2" />
             Agregar {activeTab === "courses" ? "Curso" : activeTab === "masters" ? "Maestría" : "Noticia"}
           </button>
+
+          
         </div>
 
         {/* Data Table */}
@@ -96,6 +104,41 @@ export default function AdminPanel() {
           {activeTab === "courses" && <CourseTable courses={courses} onEdit={handleEdit} onDelete={deleteCourse} />}
           {activeTab === "masters" && <MasterTable masters={masters} onEdit={handleEdit} onDelete={deleteMaster} />}
           {activeTab === "news" && <NewsTable news={news} onEdit={handleEdit} onDelete={deleteNews} />}
+          {activeTab === "perfil" && (
+            <div className="min-h-[300px] flex items-center justify-center">
+              <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
+                <div className="flex flex-col items-center mb-8">
+                  <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                    <UserCircle className="w-12 h-12 text-blue-600" />
+                  </div>
+                  <h1 className="text-2xl font-bold">{session?.user?.name || "Usuario"}</h1>
+                  <p className="text-gray-500">{session?.user?.email}</p>
+                </div>
+                <div className="space-y-4">
+                  <button
+                    onClick={() => router.push("/perfil/cambiar-clave")}
+                    className="w-full flex items-center justify-between p-4 bg-white border rounded-lg hover:bg-gray-50 transition"
+                  >
+                    <div className="flex items-center">
+                      <Key className="w-5 h-5 text-blue-600 mr-3" />
+                      <span>Cambiar contraseña</span>
+                    </div>
+                    <span className="text-gray-400">→</span>
+                  </button>
+                  <button
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                    className="w-full flex items-center justify-between p-4 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition mt-8"
+                  >
+                    <div className="flex items-center">
+                      <LogOut className="w-5 h-5 text-red-500 mr-3" />
+                      <span className="text-red-500">Cerrar sesión</span>
+                    </div>
+                    <span className="text-red-300">→</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

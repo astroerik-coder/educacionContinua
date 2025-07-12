@@ -63,7 +63,8 @@ interface AcademicContextType {
   deleteNews: (id: string) => void;
 }
 
-const AcademicContext = createContext<AcademicContextType | undefined>(
+// Create and export the context
+export const AcademicContext = createContext<AcademicContextType | undefined>(
   undefined
 );
 
