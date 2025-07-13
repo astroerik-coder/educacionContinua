@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { AlertCircle, Check } from "lucide-react";
+import { AlertCircle, Check, LogOut } from "lucide-react";
 
 export default function ChangePasswordPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   // Use the same type assertion as in PasswordChangeCheck
   type ExtendedSessionUser = {
     id?: string;
@@ -22,6 +22,20 @@ export default function ChangePasswordPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  // Mostrar loading mientras se verifica la sesión
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100">
+        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md text-center">
+          <h2 className="text-xl font-semibold mb-4">Cargando...</h2>
+          <div className="mt-4">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Redireccionar si no hay sesión
   if (!session) {
@@ -72,9 +86,16 @@ export default function ChangePasswordPage() {
       setNewPassword("");
       setConfirmPassword("");
 
-      // Redireccionar después de 3 segundos
+      // Forzar logout y relogin para actualizar la sesión
+      console.log("Contraseña actualizada, cerrando sesión para actualizar...");
+      
+      // Mostrar mensaje de éxito por 3 segundos
       setTimeout(() => {
-        router.push("/");
+        // Cerrar sesión y redirigir a login
+        signOut({ 
+          callbackUrl: "/login?message=password_changed",
+          redirect: true 
+        });
       }, 3000);
     } catch (error) {
       setError((error as Error).message);
@@ -94,7 +115,7 @@ export default function ChangePasswordPage() {
             <span>Por razones de seguridad, debes cambiar tu contraseña antes de continuar.</span>
           </div>
         )}
-        
+                
         {success ? (
           <div className="bg-green-100 border border-green-300 text-green-700 px-4 py-3 rounded flex items-center mb-4">
             <Check className="w-5 h-5 mr-2" />
@@ -170,13 +191,23 @@ export default function ChangePasswordPage() {
               )}
             </button>
             
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="text-blue-600 hover:text-blue-800 text-center text-sm mt-2"
-            >
-              Volver
-            </button>
+            <div className="flex gap-2 mt-2">
+              <button
+                type="button"
+                onClick={() => router.back()}
+                className="flex-1 text-blue-600 hover:text-blue-800 text-center text-sm"
+              >
+                Volver
+              </button>
+              <button
+                type="button"
+                onClick={() => signOut({ callbackUrl: "/login" })}
+                className="flex-1 text-red-600 hover:text-red-800 text-center text-sm flex items-center justify-center"
+              >
+                <LogOut className="w-4 h-4 mr-1" />
+                Cerrar Sesión
+              </button>
+            </div>
           </form>
         )}
       </div>

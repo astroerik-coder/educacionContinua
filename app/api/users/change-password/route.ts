@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import bcrypt from "bcryptjs";
-import { authOptions } from "../../auth/[...nextauth]";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 
 interface ChangePasswordRequest {
@@ -47,15 +47,26 @@ export async function POST(request: Request) {
 
     // Actualizar contraseña y marcar que el usuario ya no necesita cambiar la contraseña
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-    await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: { id: user.id },
       data: { 
         password: hashedNewPassword,
         mustChangePassword: false
       },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        mustChangePassword: true,
+      },
     });
 
-    return NextResponse.json({ success: true, message: "Contraseña actualizada correctamente" });
+    return NextResponse.json({ 
+      success: true, 
+      message: "Contraseña actualizada correctamente",
+      user: updatedUser,
+      sessionUpdated: true
+    });
   } catch (error) {
     console.error("Error al cambiar contraseña:", error);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });

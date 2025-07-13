@@ -7,10 +7,11 @@ import type { ReactNode } from "react";
 export default function SessionProvider({ children }: { children: ReactNode }) {
   return (
     <NextAuthSessionProvider 
-      refetchInterval={5 * 60} 
-      refetchOnWindowFocus={true}
+      refetchInterval={24 * 60 * 60} 
+      refetchOnWindowFocus={false}
       refetchWhenOffline={false}
       basePath="/api/auth"
+      refetchInterval={0} // Desactivar refetch automático para evitar problemas
     >
       {children}
     </NextAuthSessionProvider>

@@ -104,19 +104,29 @@ export function AcademicProvider({ children }: { children: React.ReactNode }) {
         if (coursesRes.ok) {
           const coursesData = await coursesRes.json();
           setCourses(coursesData);
+        } else {
+          console.error('Error fetching courses:', coursesRes.status);
         }
 
         if (mastersRes.ok) {
           const mastersData = await mastersRes.json();
           setMasters(mastersData);
+        } else {
+          console.error('Error fetching masters:', mastersRes.status);
         }
 
         if (newsRes.ok) {
           const newsData = await newsRes.json();
           setNews(filterExpiredNews(newsData));
+        } else {
+          console.error('Error fetching news:', newsRes.status);
         }
       } catch (error) {
         console.error('Error loading data:', error);
+        // Establecer arrays vacíos en caso de error para evitar errores de renderizado
+        setCourses([]);
+        setMasters([]);
+        setNews([]);
       } finally {
         setLoading(false);
       }

@@ -3,10 +3,18 @@ import { prisma } from "@/lib/prisma";
 import QRCode from "qrcode";
 
 export async function GET() {
-  const courses = await prisma.course.findMany({
-    orderBy: { createdAt: "desc" },
-  });
-  return NextResponse.json(courses);
+  try {
+    const courses = await prisma.course.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+    return NextResponse.json(courses);
+  } catch (error) {
+    console.error("Error fetching courses:", error);
+    return NextResponse.json(
+      { error: "Error al cargar los cursos", details: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(req: NextRequest) {

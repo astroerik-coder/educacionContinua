@@ -88,13 +88,15 @@ export default function AdminPanel() {
       <div className="bg-white rounded-lg shadow-sm">
         {/* Action Bar */}
         <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-          <button
-            onClick={() => setShowForm(true)}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Agregar {activeTab === "courses" ? "Curso" : activeTab === "masters" ? "Maestría" : "Noticia"}
-          </button>
+          {activeTab !== "perfil" && (
+            <button
+              onClick={() => setShowForm(true)}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Agregar {activeTab === "courses" ? "Curso" : activeTab === "masters" ? "Maestría" : "Noticia"}
+            </button>
+          )}
 
           
         </div>
